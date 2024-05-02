@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix Multiplier</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    table {
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    input {
+        width: 50px;
+        text-align: center;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+        margin-right: 5px;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    #result {
+        font-weight: bold;
+    }
+    .btn1, .btn2{
+        margin-top: 2vh;
+    }
+    .multibtn:hover{
+        background-color: aqua;
+        font-size: 5vh;
+    }
+</style>
+</head>
+<body>
+
+<h1 style="text-align: center; color: rgb(89, 23, 220); font-family:Verdana, Geneva, Tahoma, sans-serif; text-decoration: underline;">Matrix Multiplier</h1>
+<div class="box" style="display: flex;">
+    <div class="inp">
+<h3 style="text-align: center; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">Matrix 1</h3>
+<div class="m1" style="display: flex;">
+<table id="matrix1"></table>
+<div class="btns1" style="display: flex; flex-direction: column; margin-left: 2vh;"><button class="btn1" onclick="addRow('matrix1')">Add Row</button>
+<button class="btn1" onclick="addColumn('matrix1')">Add Column</button>
+<button class="btn1" onclick="deleteRow('matrix1')">Delete Row</button>
+<button class="btn1" onclick="deleteColumn('matrix1')">Delete Column</button></div></div>
+
+<h3 style="text-align: center; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">Matrix 2</h3>
+<div class="m2" style="display: flex;">
+    <table id="matrix2"></table>
+    <div class="btns2" style="display: flex; flex-direction: column; margin-left: 2vh;"><button class="btn2" onclick="addRow('matrix2')">Add Row</button>
+    <button class="btn2" onclick="addColumn('matrix2')">Add Column</button>
+    <button class="btn2" onclick="deleteRow('matrix2')">Delete Row</button>
+    <button class="btn2" onclick="deleteColumn('matrix2')">Delete Column</button></div></div>
+<!-- <table id="matrix2"></table>
+<button class="btn2" onclick="addRow('matrix2')">Add Row</button>
+<button class="btn2" onclick="addColumn('matrix2')">Add Column</button>
+<button class="btn2" onclick="deleteRow('matrix2')">Delete Row</button>
+<button class="btn2" onclick="deleteColumn('matrix2')">Delete Column</button> -->
+
+<button class="multibtn" id="multibtn" onclick="multiplyMatrices()" style=" margin:2vh; color: rgb(63, 20, 255); border-radius: 20px; border: 2px solid red; text-decoration: black; background-color: rgb(69, 171, 226); font-size: 2vw;" onmouseover="change()" onmouseout="range()">Multiply Matrices</button></div>
+<div class="out" style="text-align: center; justify-content: center; display: block; margin-left: 30vw; margin-top: 20vh;">
+<h3>Result</h3>
+<div id="result"></div></div></div>
+
+<script>
+    function range(){
+        let x=document.getElementById("multibtn");
+        x.style.backgroundColor="rgb(69,171,226)";
+        x.style.fontSize="2vw";
+
+    }
+    
+    function change(){
+        let x=document.getElementById("multibtn");
+        x.style.backgroundColor="lightgreen";
+        x.style.fontSize="2.5vw";
+
+    }
+    function createSampleMatrix(tableId) {
+        let table = document.getElementById(tableId);
+        let rows = 2;
+        let cols = 2;
+        for (let i = 0; i < rows; i++) {
+            let row = table.insertRow();
+            for (let j = 0; j < cols; j++) {
+                let cell = row.insertCell();
+                let input = document.createElement('input');
+                input.type = 'number';
+                input.value = i * cols + j + 1;
+                cell.appendChild(input);
+            }
+        }
+    }
+
+    function addRow(tableId) {
+        let table = document.getElementById(tableId);
+        let newRow = table.insertRow();
+        let cols = table.rows[0].cells.length;
+        for (let i = 0; i < cols; i++) {
+            let cell = newRow.insertCell();
+            let input = document.createElement('input');
+            input.type = 'number';
+            cell.appendChild(input);
+        }
+    }
+
+    function addColumn(tableId) {
+        let table = document.getElementById(tableId);
+        let rows = table.rows;
+        for (let i = 0; i < rows.length; i++) {
+            let cell = rows[i].insertCell(-1);
+            let input = document.createElement('input');
+            input.type = 'number';
+            cell.appendChild(input);
+        }
+    }
+
+    function deleteRow(tableId) {
+        let table = document.getElementById(tableId);
+        if (table.rows.length > 1) {
+            table.deleteRow(-1);
+        }
+    }
+
+    function deleteColumn(tableId) {
+        let table = document.getElementById(tableId);
+        let rows = table.rows;
+        for (let i = 0; i < rows.length; i++) {
+            let cells = rows[i].cells;
+            if (cells.length > 1) {
+                rows[i].deleteCell(-1);
+            }
+        }
+    }
+
+    function multiplyMatrices() {
+        let x=document.getElementById("multibtn");
+        x.style.border="3px solid grey";
+        let matrix1 = getMatrixValues('matrix1');
+        let matrix2 = getMatrixValues('matrix2');
+
+        if (!isValidMatrix(matrix1) || !isValidMatrix(matrix2)) {
+            alert('Please fill all the cells in the matrices.');
+            return;
+        }
+
+        if (matrix1[0].length !== matrix2.length) {
+            alert('Number of columns in Matrix 1 must be equal to the number of rows in Matrix 2.');
+            return;
+        }
+
+        let result = multiply(matrix1, matrix2);
+
+        displayResult(result);
+    }
+
+    function getMatrixValues(matrixId) {
+        let matrix = [];
+        let rows = document.getElementById(matrixId).rows;
+        for (let i = 0; i < rows.length; i++) {
+            let rowData = [];
+            let cells = rows[i].cells;
+            for (let j = 0; j < cells.length; j++) {
+                let input = cells[j].querySelector('input');
+                rowData.push(parseFloat(input.value));
+            }
+            matrix.push(rowData);
+        }
+        return matrix;
+    }
+
+    function isValidMatrix(matrix) {
+        for (let i = 0; i < matrix.length; i++) {
+            for (let j = 0; j < matrix[i].length; j++) {
+                if (isNaN(matrix[i][j])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function multiply(matrix1, matrix2) {
+        let result = [];
+        for (let i = 0; i < matrix1.length; i++) {
+            result.push([]);
+            for (let j = 0; j < matrix2[0].length; j++) {
+                let sum = 0;
+                for (let k = 0; k < matrix1[0].length; k++) {
+                    sum += matrix1[i][k] * matrix2[k][j];
+                }
+                result[i].push(sum);
+            }
+        }
+        return result;
+    }
+
+    function displayResult(matrix) {
+        let resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '';
+        let table = document.createElement('table');
+        matrix.forEach(rowData => {
+            let row = document.createElement('tr');
+            rowData.forEach(cellData => {
+                let cell = document.createElement('td');
+                cell.textContent = cellData;
+                row.appendChild(cell);
+            });
+            table.appendChild(row);
+        });
+        resultDiv.appendChild(table);
+    }
+
+    createSampleMatrix('matrix1');
+    createSampleMatrix('matrix2');
+</script>
+
+</body>
+</html>
